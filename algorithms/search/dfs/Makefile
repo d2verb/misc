@@ -1,0 +1,5 @@
+all:
+	g++ dfs.cpp -o dfs
+
+clean:
+	rm dfs
