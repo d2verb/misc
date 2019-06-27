@@ -9,7 +9,8 @@ bool dfs(
     int x,
     int y,
     map<int, map<int, bool>> &visited,
-    vector<pair<int, int>> &path)
+    vector<pair<int, int>> &path,
+    int depth)
 {
   const static int dx[] = {0, 1, -1, 0};
   const static int dy[] = {1, 0, 0, -1};
@@ -20,6 +21,9 @@ bool dfs(
   if (field[y][x] == 'G') {
     return true;
   }
+
+  if (depth == 0)
+    return false;
 
   int height = field.size();
   int width = field[0].size();
@@ -40,12 +44,30 @@ bool dfs(
       continue;
     }
 
-    bool found = dfs(field, nx, ny, visited, path);
+    bool found = dfs(field, nx, ny, visited, path, depth-1);
     if (found)
       return found;
   }
 
   path.pop_back();
+  return false;
+}
+
+// See: https://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search
+bool iddfs(vector<string> &field, vector<pair<int, int>> &path) {
+  int H = field.size();
+  int W = field[0].size();
+
+  // Node number is H * W, so the maximum depth is H * W
+  // Brancing factor b is b = 4, so space complexity is O(4*depth)
+  // Time complexity is O(4^depth)
+  for (int depth = 0; depth <= H * W; depth++) {
+    map<int, map<int, bool>> visited;
+    bool found = dfs(field, 0, 0, visited, path, depth);
+    if (found)
+      return true;
+    vector<pair<int, int>>().swap(path);
+  }
 
   return false;
 }
@@ -71,7 +93,6 @@ void mark_path(vector<string> &field, vector<pair<int, int>> &path) {
 int main(void) {
   vector<string> field;
   vector<pair<int, int>> path;
-  map<int, map<int, bool>> visited;
 
   int w, h; cin >> w >> h;
   for (int i = 0; i < h; i++) {
@@ -82,7 +103,7 @@ int main(void) {
   cout << "FIELD:" << endl;
   dump_field(field);
 
-  bool found = dfs(field, 0, 0, visited, path);
+  bool found = iddfs(field, path);
   if (found) {
     cout << "\nPATH:" << endl;
     mark_path(field, path);

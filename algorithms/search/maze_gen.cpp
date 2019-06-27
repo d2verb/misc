@@ -16,6 +16,9 @@ void gen_path(vector<string> &field) {
   int x = 0, y = 0;
   int nx, ny;
 
+  field[y][x] = 'S';
+  path_len--;
+
   // build path
   while (path_len > 0) {
     int i = rnd() % 2;
@@ -32,9 +35,7 @@ void gen_path(vector<string> &field) {
       break;
     }
 
-    if (path_len == (W + H) * 2 / 3) {
-      field[ny][nx] = 'S';
-    } else if (path_len == 1) {
+    if (path_len == 1) {
       field[ny][nx] = 'G';
     } else {
       field[ny][nx] = '.';
